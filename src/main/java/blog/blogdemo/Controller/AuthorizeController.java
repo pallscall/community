@@ -2,11 +2,15 @@ package blog.blogdemo.Controller;
 
 import blog.blogdemo.Dto.Access_tokenDto;
 import blog.blogdemo.Dto.GithubUser;
+import blog.blogdemo.Mapper.UserMapper;
+import blog.blogdemo.Model.User;
 import blog.blogdemo.Provider.GithubProvider;
 import com.alibaba.fastjson.JSON;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+
+import org.apache.ibatis.annotations.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -15,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.UUID;
 
 @Controller
 public class AuthorizeController {
@@ -22,6 +27,8 @@ public class AuthorizeController {
     @Autowired
     private GithubProvider githubProvider;
 
+    @Autowired
+    private UserMapper userMapper;
     @Value("${github.client.id}") private String clientId;
     @Value("${github.client.secret}") private String clientSecret;
     @Value("${github.redirect.uri}") private String redirectUri;
@@ -38,8 +45,14 @@ public class AuthorizeController {
         String accessToken = githubProvider.getAccessToken(access_tokenDto);
         System.out.println(accessToken);
         GithubUser githubUser = githubProvider.getUser(accessToken);
-        System.out.println("GGg"+githubUser);
         if(githubUser != null){
+            User user = new User();
+            user.setToken(UUID.randomUUID().toString());
+            user.setAccountId(String.valueOf(githubUser.getId()));
+            user.setName(githubUser.getName());
+            user.setGmtCreated(System.currentTimeMillis());
+            user.setGmtModified(user.getGmtCreated());
+            userMapper.insert(user);
             request.getSession().setAttribute("user",githubUser);
             return "redirect:/"; //重定向
         }else{
