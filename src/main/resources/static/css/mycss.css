@@ -1,0 +1,19 @@
+.main{
+    margin: 30px;
+    background-color: white;
+}
+body{
+    background-color: #efefef;
+}
+.btn-publish{
+    float: right;
+}
+.head-pic{
+    width: 35px;
+    height: 35px;
+}
+.text-desc{
+    font-size: 12px;
+    font-weight: normal;
+    color: #999;
+}

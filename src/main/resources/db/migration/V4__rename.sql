@@ -1,0 +1,1 @@
+alter table QUESTION alter column "like" rename to "like_count";
